@@ -24,8 +24,8 @@ const API_TOKEN = "PasteYourApiTokenHere";
 // [Authors] Place your user ID and script name here
 // - This is used for the "X-Client" HTTP header
 // - See https://habitica.fandom.com/wiki/Guidance_for_Comrades#X-Client_Header
-const AUTHOR_ID = "PasteAuthorUserIdHere";
-const SCRIPT_NAME = "TypeScriptNameHere";
+const AUTHOR_ID = "b477462a-5bb5-4040-9505-f0b049b4f0bb";
+const SCRIPT_NAME = "HabiticaNotifyQuestLatecomers";
 
 // [Authors] Add global variables here
 // - Note that these do not persist in between script calls
@@ -52,7 +52,7 @@ function install() {
     // if all options entered by the user are valid
     if (validateOptions()) {
       // create triggers
-      createTriggers();
+      // createTriggers();
       // create webhooks
       createWebhooks();
 
@@ -113,9 +113,10 @@ function createWebhooks() {
   logInfo("Creating webhooks");
 
   let webhookData = {
-    "type": "taskActivity",
+    "type": "questActivity",
     "options": {
-      "scored": true
+      "questInvited": true,
+      "questStarted": true
     }
   }
   api_createWebhook(webhookData);
