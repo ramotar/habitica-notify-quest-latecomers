@@ -55,7 +55,7 @@ function processWebhookDelayed(type, data) {
     let questName = HabiticaQuestKeys.getQuestName(questKey);
     let questString = (questName == null ? "`" + questKey + "`" : "_" + questName + "_");
     let questInfo = "The quest " + questString + " was started " + delayInSeconds.toFixed(0) + " seconds after the invitation.";
-    
+
     let latecomerMessage = questInfo + "\n\n";
     latecomerMessage += "Your Auto Accept script failed to accept the quest invite within this time frame. Please check, whether it is working correctly!";
 
