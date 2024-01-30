@@ -42,13 +42,9 @@ function processWebhookDelayed(type, data) {
   if (Object.keys(questMembers).length != partyMembers.length) {
 
     let latecomers = [];
-    let latecomerIDs = [];
-    let latecomerNames = [];
     for (let member of partyMembers) {
       if (!(member._id in questMembers)) {
         latecomers.push(member);
-        latecomerIDs.push(member._id);
-        latecomerNames.push(member.auth.local.username);
       }
     }
 
@@ -59,13 +55,21 @@ function processWebhookDelayed(type, data) {
     let latecomerMessage = questInfo + "\n\n";
     latecomerMessage += "Your Auto Accept script failed to accept the quest invite within this time frame. Please check, whether it is working correctly!";
 
-    let leaderMessage = questInfo + "\n\n";
-    leaderMessage += "The following party members don't participate in the quest, because their Auto Accept script didn't respond in time:\n";
+    let partyMessage = questInfo + "\n\n";
+    partyMessage += "The following party members don't participate in the quest, because their Auto Accept script didn't respond in time:\n";
     for (let member of latecomers) {
-      leaderMessage += "* " + member.profile.name + " (@" + member.auth.local.username + ")\n";
+      partyMessage += "* " + member.profile.name + " (@" + member.auth.local.username + ")\n";
     }
 
-    api_sendPM(leaderMessage, partyLeader.id);
+    // Send message to the party
+    let params = Object.assign({
+      "contentType": "application/json",
+      "payload": JSON.stringify({
+        "message": String(partyMessage)
+      })
+    }, POST_PARAMS);
+
+    api_fetch("https://habitica.com/api/v3/groups/party/chat", params);
   }
 }
 
