@@ -39,6 +39,15 @@ function processWebhookDelayed(type, data) {
 
   let partyMembers = api_getPartyMembers();
 
+  let questName = HabiticaQuestKeys.getQuestName(questKey);
+  let questString = (questName == null ? "`" + questKey + "`" : "**" + questName + "**");
+  let questInfo = "The quest " + questString + " was started " + delayInSeconds.toFixed(0) + " seconds after the invitation.";
+
+  let latecomerMessage = questInfo + "\n\n";
+  latecomerMessage += "Your Auto Accept script failed to accept the quest invite within this time frame. Please check, whether it is working correctly!";
+
+  let partyMessage = questInfo + "\n\n";
+
   if (Object.keys(questMembers).length != partyMembers.length) {
 
     let latecomers = [];
@@ -48,29 +57,24 @@ function processWebhookDelayed(type, data) {
       }
     }
 
-    let questName = HabiticaQuestKeys.getQuestName(questKey);
-    let questString = (questName == null ? "`" + questKey + "`" : "_" + questName + "_");
-    let questInfo = "The quest " + questString + " was started " + delayInSeconds.toFixed(0) + " seconds after the invitation.";
-
-    let latecomerMessage = questInfo + "\n\n";
-    latecomerMessage += "Your Auto Accept script failed to accept the quest invite within this time frame. Please check, whether it is working correctly!";
-
-    let partyMessage = questInfo + "\n\n";
     partyMessage += "The following party members don't participate in the quest, because their Auto Accept script didn't respond in time:\n";
     for (let member of latecomers) {
       partyMessage += "* " + member.profile.name + " (@" + member.auth.local.username + ")\n";
     }
-
-    // Send message to the party
-    let params = Object.assign({
-      "contentType": "application/json",
-      "payload": JSON.stringify({
-        "message": String(partyMessage)
-      })
-    }, POST_PARAMS);
-
-    api_fetch("https://habitica.com/api/v3/groups/party/chat", params);
   }
+  else {
+    partyMessage += "All party members participate in the quest &#127881;";
+  }
+
+  // Send message to the party
+  let partyParams = Object.assign({
+    "contentType": "application/json",
+    "payload": JSON.stringify({
+      "message": String(partyMessage)
+    })
+  }, POST_PARAMS);
+
+  api_fetch("https://habitica.com/api/v3/groups/party/chat", partyParams);
 }
 
 function processTrigger() {
