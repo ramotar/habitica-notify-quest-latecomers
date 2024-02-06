@@ -76,15 +76,7 @@ function processWebhookDelayed(type, data) {
   }
 
   if (MESSAGE_TO_PARTY) {
-    // Send message to the party
-    let partyParams = Object.assign({
-      "contentType": "application/json",
-      "payload": JSON.stringify({
-        "message": String(leaderMessage)
-      })
-    }, POST_PARAMS);
-
-    api_fetch("https://habitica.com/api/v3/groups/party/chat", partyParams);
+    api_sendPartyMessage(leaderMessage);
   }
 }
 

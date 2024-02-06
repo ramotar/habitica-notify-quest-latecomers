@@ -186,6 +186,22 @@ function api_sendPM(message, recipient = INT_USER_ID) {
 }
 
 /**
+ * api_sendPartyMessage(message)
+ *
+ * Sends a message to your party.
+ */
+function api_sendPartyMessage(message) {
+  let params = Object.assign({
+    "contentType": "application/json",
+    "payload": JSON.stringify({
+      "message": String(message)
+    })
+  }, POST_PARAMS);
+
+  api_fetch("https://habitica.com/api/v3/groups/party/chat", params);
+}
+
+/**
  * api_createWebhook(webhookData)
  *
  * Creates a webhook with the given webhook data.
