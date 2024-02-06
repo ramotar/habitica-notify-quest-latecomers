@@ -10,6 +10,9 @@ const API_TOKEN = "PasteYourApiTokenHere";
 /* ========================================== */
 // [Authors] Place all mandatory user-modified variables here
 // - e.g. skill to use, number of times to use, task to use skill on, etc.
+const PM_TO_LATECOMERS = false;
+const PM_TO_PARTY_LEADER = false;
+const MESSAGE_TO_PARTY = true;
 
 /* ========================================== */
 /* [Users] Optional customizations to fill in */
@@ -177,6 +180,21 @@ function validateOptions() {
   // test credentials
   if (valid) {
     valid = testCredentials();
+  }
+
+  if (typeof PM_TO_LATECOMERS !== "boolean") {
+    logError("PM_TO_LATECOMERS must be a boolean value.\n\ne.g. const PM_TO_LATECOMERS = true;");
+    valid = false;
+  }
+
+  if (typeof PM_TO_PARTY_LEADER !== "boolean") {
+    logError("PM_TO_PARTY_LEADER must be a boolean value.\n\ne.g. const PM_TO_PARTY_LEADER = true;");
+    valid = false;
+  }
+
+  if (typeof MESSAGE_TO_PARTY !== "boolean") {
+    logError("MESSAGE_TO_PARTY must be a boolean value.\n\ne.g. const MESSAGE_TO_PARTY = true;");
+    valid = false;
   }
 
   if (!valid) {

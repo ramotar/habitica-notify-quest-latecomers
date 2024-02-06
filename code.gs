@@ -43,38 +43,49 @@ function processWebhookDelayed(type, data) {
   let questString = (questName == null ? "`" + questKey + "`" : "**" + questName + "**");
   let questInfo = "The quest " + questString + " was started " + delayInSeconds.toFixed(0) + " seconds after the invitation.";
 
+  let latecomers = [];
   let latecomerMessage = questInfo + "\n\n";
-  latecomerMessage += "Your Auto Accept script failed to accept the quest invite within this time frame. Please check, whether it is working correctly!";
+  latecomerMessage += "Your Auto Accept script failed to accept the quest invite within this time frame.  \nPlease check, whether it is working correctly!";
 
-  let partyMessage = questInfo + "\n\n";
+  let leaderMessage = questInfo + "\n\n";
 
   if (Object.keys(questMembers).length != partyMembers.length) {
-
-    let latecomers = [];
     for (let member of partyMembers) {
       if (!(member._id in questMembers)) {
         latecomers.push(member);
       }
     }
 
-    partyMessage += "The following party members don't participate in the quest, because their Auto Accept script didn't respond in time:\n";
+    leaderMessage += "The following party members don't participate in the quest, because their Auto Accept script didn't respond in time:\n";
     for (let member of latecomers) {
-      partyMessage += "* " + member.profile.name + " (@" + member.auth.local.username + ")\n";
+      leaderMessage += "* " + member.profile.name + " (@" + member.auth.local.username + ")\n";
     }
   }
   else {
-    partyMessage += "All party members participate in the quest &#127881;";
+    leaderMessage += "All party members participate in the quest &#127881;";
   }
 
-  // Send message to the party
-  let partyParams = Object.assign({
-    "contentType": "application/json",
-    "payload": JSON.stringify({
-      "message": String(partyMessage)
-    })
-  }, POST_PARAMS);
+  if (PM_TO_LATECOMERS) {
+    for (let member of latecomers) {
+      api_sendPM(latecomerMessage, member.id);
+    }
+  }
 
-  api_fetch("https://habitica.com/api/v3/groups/party/chat", partyParams);
+  if (PM_TO_PARTY_LEADER) {
+    api_sendPM(leaderMessage, partyLeader.id);
+  }
+
+  if (MESSAGE_TO_PARTY) {
+    // Send message to the party
+    let partyParams = Object.assign({
+      "contentType": "application/json",
+      "payload": JSON.stringify({
+        "message": String(leaderMessage)
+      })
+    }, POST_PARAMS);
+
+    api_fetch("https://habitica.com/api/v3/groups/party/chat", partyParams);
+  }
 }
 
 function processTrigger() {
