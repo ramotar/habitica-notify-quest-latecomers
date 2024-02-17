@@ -32,7 +32,7 @@ const API_TOKEN = "PasteYourApiTokenHere";
 // - This is used for the "X-Client" HTTP header
 // - See https://habitica.fandom.com/wiki/Guidance_for_Comrades#X-Client_Header
 const AUTHOR_ID = "b477462a-5bb5-4040-9505-f0b049b4f0bb";
-const SCRIPT_NAME = "HabiticaNotifyQuestLatecomers";
+const SCRIPT_NAME = "NotifyQuestLatecomers";
 
 // [Authors] Add global variables here
 // - Note that these do not persist in between script calls
