@@ -62,7 +62,7 @@ function processWebhookDelayed(type, data) {
     }
   }
   else {
-    partyMessage += "All party members participate in the quest &#127881;";
+    leaderMessage += "All party members participate in the quest &#127881;";
   }
 
   if (PM_TO_LATECOMERS) {

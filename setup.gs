@@ -1,5 +1,5 @@
 /**
- * Notify Quest Latecomers v1.0.0 by Turac
+ * Notify Quest Latecomers v1.0.1 by Turac
  *
  * See Wiki page for info & setup instructions:
  * https://habitica.fandom.com/wiki/Notify_Quest_Latecomers
