@@ -1,3 +1,10 @@
+/**
+ * Notify Quest Latecomers v1.0.1 by Turac
+ *
+ * See Wiki page for info & setup instructions:
+ * https://habitica.fandom.com/wiki/Notify_Quest_Latecomers
+ */
+
 /* ========================================== */
 /* [Users] Required script data to fill in    */
 /* ========================================== */
@@ -10,6 +17,9 @@ const API_TOKEN = "PasteYourApiTokenHere";
 /* ========================================== */
 // [Authors] Place all mandatory user-modified variables here
 // - e.g. skill to use, number of times to use, task to use skill on, etc.
+const MESSAGE_TO_PARTY = true;
+const PM_TO_PARTY_LEADER = false;
+const PM_TO_LATECOMERS = false;
 
 /* ========================================== */
 /* [Users] Optional customizations to fill in */
@@ -25,7 +35,7 @@ const API_TOKEN = "PasteYourApiTokenHere";
 // - This is used for the "X-Client" HTTP header
 // - See https://habitica.fandom.com/wiki/Guidance_for_Comrades#X-Client_Header
 const AUTHOR_ID = "b477462a-5bb5-4040-9505-f0b049b4f0bb";
-const SCRIPT_NAME = "HabiticaNotifyQuestLatecomers";
+const SCRIPT_NAME = "NotifyQuestLatecomers";
 
 // [Authors] Add global variables here
 // - Note that these do not persist in between script calls
@@ -177,6 +187,21 @@ function validateOptions() {
   // test credentials
   if (valid) {
     valid = testCredentials();
+  }
+
+  if (typeof MESSAGE_TO_PARTY !== "boolean") {
+    logError("MESSAGE_TO_PARTY must be a boolean value.\n\ne.g. const MESSAGE_TO_PARTY = true;");
+    valid = false;
+  }
+
+  if (typeof PM_TO_PARTY_LEADER !== "boolean") {
+    logError("PM_TO_PARTY_LEADER must be a boolean value.\n\ne.g. const PM_TO_PARTY_LEADER = true;");
+    valid = false;
+  }
+
+  if (typeof PM_TO_LATECOMERS !== "boolean") {
+    logError("PM_TO_LATECOMERS must be a boolean value.\n\ne.g. const PM_TO_LATECOMERS = true;");
+    valid = false;
   }
 
   if (!valid) {

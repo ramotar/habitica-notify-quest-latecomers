@@ -39,33 +39,44 @@ function processWebhookDelayed(type, data) {
 
   let partyMembers = api_getPartyMembers();
 
-  if (Object.keys(questMembers).length != partyMembers.length) {
+  let questName = HabiticaQuestKeys.getQuestName(questKey);
+  let questString = (questName == null ? "`" + questKey + "`" : "**" + questName + "**");
+  let questInfo = "The quest " + questString + " was started " + delayInSeconds.toFixed(0) + " seconds after the invitation.";
 
-    let latecomers = [];
-    let latecomerIDs = [];
-    let latecomerNames = [];
+  let latecomers = [];
+  let latecomerMessage = questInfo + "\n\n";
+  latecomerMessage += "Your Auto Accept script failed to accept the quest invite within this time frame.  \nPlease check, whether it is working correctly!";
+
+  let leaderMessage = questInfo + "\n\n";
+
+  if (Object.keys(questMembers).length != partyMembers.length) {
     for (let member of partyMembers) {
       if (!(member._id in questMembers)) {
         latecomers.push(member);
-        latecomerIDs.push(member._id);
-        latecomerNames.push(member.auth.local.username);
       }
     }
 
-    let questName = HabiticaQuestKeys.getQuestName(questKey);
-    let questString = (questName == null ? "`" + questKey + "`" : "_" + questName + "_");
-    let questInfo = "The quest " + questString + " was started " + delayInSeconds.toFixed(0) + " seconds after the invitation.";
-
-    let latecomerMessage = questInfo + "\n\n";
-    latecomerMessage += "Your Auto Accept script failed to accept the quest invite within this time frame. Please check, whether it is working correctly!";
-
-    let leaderMessage = questInfo + "\n\n";
     leaderMessage += "The following party members don't participate in the quest, because their Auto Accept script didn't respond in time:\n";
     for (let member of latecomers) {
       leaderMessage += "* " + member.profile.name + " (@" + member.auth.local.username + ")\n";
     }
+  }
+  else {
+    leaderMessage += "All party members participate in the quest &#127881;";
+  }
 
+  if (PM_TO_LATECOMERS) {
+    for (let member of latecomers) {
+      api_sendPM(latecomerMessage, member.id);
+    }
+  }
+
+  if (PM_TO_PARTY_LEADER) {
     api_sendPM(leaderMessage, partyLeader.id);
+  }
+
+  if (MESSAGE_TO_PARTY) {
+    api_sendPartyMessage(leaderMessage);
   }
 }
 
