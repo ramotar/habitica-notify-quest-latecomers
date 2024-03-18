@@ -48,6 +48,7 @@ function processWebhookDelayed(type, data) {
   latecomerMessage += "Your Auto Accept script failed to accept the quest invite within this time frame.  \nPlease check, whether it is working correctly!";
 
   let leaderMessage = questInfo + "\n\n";
+  let discordMessage = questInfo + "\n";
 
   if (Object.keys(questMembers).length != partyMembers.length) {
     for (let member of partyMembers) {
@@ -58,14 +59,17 @@ function processWebhookDelayed(type, data) {
 
     let sadMessage = "The following party members don't participate in the quest, because their Auto Accept script didn't respond in time:\n";
     leaderMessage += sadMessage;
+    discordMessage += sadMessage;
 
     for (let member of latecomers) {
       leaderMessage += "* " + member.profile.name + " (@" + member.auth.local.username + ")\n";
+      discordMessage += "* " + member.profile.name + " ([@" + member.auth.local.username + "](https://habitica.com/profile/" + member._id + "))\n";
     }
   }
   else {
     let happyMessage = "All party members participate in the quest";
     leaderMessage += happyMessage + " &#127881;";
+    discordMessage += happyMessage + " :tada:";
   }
 
   if (PM_TO_LATECOMERS) {
@@ -85,9 +89,29 @@ function processWebhookDelayed(type, data) {
   if (MESSAGE_TO_PARTY) {
     api_sendPartyMessage(leaderMessage);
   }
+
+  if (MESSAGE_TO_DISCORD) {
+    sendDiscordMessage(discordMessage);
+  }
 }
 
 function processTrigger() {
   // [Authors] This function gets called by the example trigger.
   // - This is the place for recurrent tasks.
+}
+
+function sendDiscordMessage(message) {
+  let payload = {
+    "content": message,
+    "flags": 4,
+  };
+
+  let params = {
+    "method": "POST",
+    "contentType": "application/json",
+    "payload": JSON.stringify(payload),
+    "muteHttpExceptions": true
+  }
+
+  return UrlFetchApp.fetch(DISCORD_WEBHOOK_URL, params);
 }

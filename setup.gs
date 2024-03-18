@@ -27,6 +27,8 @@ const PM_TO_LATECOMERS = false;
 /* ========================================== */
 // [Authors] Place all optional user-modified variables here
 // - e.g. enable/disable notifications, enable/disable script features, etc.
+const MESSAGE_TO_DISCORD = true;
+const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz";
 
 /* ========================================== */
 /* [Users] Do not edit code below this line   */
@@ -207,6 +209,16 @@ function validateOptions() {
 
   if (typeof PM_TO_LATECOMERS !== "boolean") {
     logError("PM_TO_LATECOMERS must be a boolean value.\n\ne.g. const PM_TO_LATECOMERS = true;");
+    valid = false;
+  }
+
+  if (typeof MESSAGE_TO_DISCORD !== "boolean") {
+    logError("MESSAGE_TO_DISCORD must be a boolean value.\n\ne.g. const MESSAGE_TO_DISCORD = true;");
+    valid = false;
+  }
+
+  if (typeof DISCORD_WEBHOOK_URL !== "string" || !DISCORD_WEBHOOK_URL.startsWith("https://discord.com/api/webhooks/")) {
+    logError("DISCORD_WEBHOOK_URL must be the URL to a Discord webhook.\n\ne.g. const DISCORD_WEBHOOK_URL = \"https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz\";");
     valid = false;
   }
 
