@@ -56,13 +56,16 @@ function processWebhookDelayed(type, data) {
       }
     }
 
-    leaderMessage += "The following party members don't participate in the quest, because their Auto Accept script didn't respond in time:\n";
+    let sadMessage = "The following party members don't participate in the quest, because their Auto Accept script didn't respond in time:\n";
+    leaderMessage += sadMessage;
+
     for (let member of latecomers) {
       leaderMessage += "* " + member.profile.name + " (@" + member.auth.local.username + ")\n";
     }
   }
   else {
-    leaderMessage += "All party members participate in the quest &#127881;";
+    let happyMessage = "All party members participate in the quest";
+    leaderMessage += happyMessage + " &#127881;";
   }
 
   if (PM_TO_LATECOMERS) {
@@ -71,7 +74,11 @@ function processWebhookDelayed(type, data) {
     }
   }
 
-  if (PM_TO_PARTY_LEADER) {
+  if (PM_TO_PARTY_LEADER_IF_LATECOMERS && latecomers.length > 0) {
+    api_sendPM(leaderMessage, partyLeader.id);
+  }
+
+  if (PM_TO_PARTY_LEADER_IF_NO_LATECOMERS && latecomers.length == 0) {
     api_sendPM(leaderMessage, partyLeader.id);
   }
 
