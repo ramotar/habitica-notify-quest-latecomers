@@ -39,7 +39,8 @@ function processWebhookDelayed(type, data) {
 
   let partyMembers = api_getPartyMembers();
 
-  let questName = HabiticaQuestKeys.getQuestName(questKey);
+  let questName = null;
+  if (typeof HabiticaQuestKeys == 'object') questName = HabiticaQuestKeys.getQuestName(questKey);
   let questString = (questName == null ? "`" + questKey + "`" : "**" + questName + "**");
   let questInfo = "The quest " + questString + " was started " + delayInSeconds.toFixed(0) + " seconds after the invitation.";
 
