@@ -39,8 +39,7 @@ function processWebhookDelayed(type, data) {
 
   let partyMembers = api_getPartyMembers();
 
-  let questName = null;
-  if (typeof HabiticaQuestKeys == 'object') questName = HabiticaQuestKeys.getQuestName(questKey);
+  let questName = getQuestName(questKey);
   let questString = (questName == null ? "`" + questKey + "`" : "**" + questName + "**");
   let questInfo = "The quest " + questString + " was started " + delayInSeconds.toFixed(0) + " seconds after the invitation.";
 
@@ -115,4 +114,15 @@ function sendDiscordMessage(message) {
   }
 
   return UrlFetchApp.fetch(DISCORD_WEBHOOK_URL, params);
+}
+
+function getQuestName(key, defaultValue = null) {
+  let content = api_getContent();
+
+  if (key in content.quests) {
+    return content.quests[key].text;
+  }
+  else {
+    return defaultValue;
+  }
 }
