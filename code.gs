@@ -41,14 +41,23 @@ function processWebhookDelayed(type, data) {
 
   let questName = getQuestName(questKey);
   let questString = (questName == null ? "`" + questKey + "`" : "**" + questName + "**");
-  let questInfo = "The quest " + questString + " was started " + delayInSeconds.toFixed(0) + " seconds after the invitation.";
+
+  let leaderMessage = "The quest " + questString;
+  let discordMessage = "The quest " + questString;
+
+  if (NAME_QUEST_OWNER) {
+    let questOwner = partyMembers.find((member) => member._id == party.quest.leader);
+
+    leaderMessage += " by " + questOwner.profile.name + " (@" + questOwner.auth.local.username + ")"
+    discordMessage += " by " + questOwner.profile.name + " ([@" + questOwner.auth.local.username + "](https://habitica.com/profile/" + questOwner._id + "))"
+  }
+
+  leaderMessage += " was started " + delayInSeconds.toFixed(0) + " seconds after the invitation.\n\n";
+  discordMessage += " was started " + delayInSeconds.toFixed(0) + " seconds after the invitation.\n";
 
   let latecomers = [];
-  let latecomerMessage = questInfo + "\n\n";
+  let latecomerMessage = leaderMessage;
   latecomerMessage += "Your Auto Accept script failed to accept the quest invite within this time frame.  \nPlease check, whether it is working correctly!";
-
-  let leaderMessage = questInfo + "\n\n";
-  let discordMessage = questInfo + "\n";
 
   if (Object.keys(questMembers).length != partyMembers.length) {
     for (let member of partyMembers) {

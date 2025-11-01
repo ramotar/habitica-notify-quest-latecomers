@@ -27,6 +27,7 @@ const PM_TO_LATECOMERS = false;
 /* ========================================== */
 // [Authors] Place all optional user-modified variables here
 // - e.g. enable/disable notifications, enable/disable script features, etc.
+const NAME_QUEST_OWNER = false;
 const MESSAGE_TO_DISCORD = true;
 const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz";
 
