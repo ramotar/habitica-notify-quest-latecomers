@@ -50,6 +50,15 @@ function doPost(event) {
         dataString = JSON.stringify(processingResult);
       }
 
+      // Check for the 100 KB cache limit of Google Apps Script
+      if (Utilities.newBlob(dataString).getBytes().length > 100 * 1000) {
+        throw Error(
+          "The data passed for delayed trigger processing is bigger than the maximum cache size (100 KB) of Google Apps Script. " +
+          "Delayed webhook processing will not be triggered.",
+          { cause: dataString }
+        )
+      }
+
       // Create a trigger for delayed processing
       var trigger = ScriptApp.newTrigger('doPostTriggered').timeBased().after(1).create();
       CacheService.getScriptCache().put(
@@ -79,8 +88,6 @@ function doPostTriggered(event) {
   try {
     // Retrieve triggerId and the webhook data
     const triggerId = event.triggerUid;
-    const dataContents = parseJSON(CacheService.getScriptCache().get(triggerId));
-    const type = dataContents.type;
 
     // Delete the trigger
     let triggers = ScriptApp.getProjectTriggers();
@@ -91,8 +98,14 @@ function doPostTriggered(event) {
       }
     }
 
+    // Retrieve the data from the cache
+    const dataContents = parseJSON(CacheService.getScriptCache().get(triggerId));
+    if (dataContents == null) {
+      throw Error("The data for delayed webhook processing couldn't be retrieved from the cache.")
+    }
+
     // Process the webhook
-    processWebhookDelayed(type, dataContents);
+    processWebhookDelayed(dataContents.type, dataContents);
   }
   catch (error) {
     // Notify the user
@@ -107,20 +120,41 @@ function doPostTriggered(event) {
  * notifyUserOfError(error)
  *
  * Notifies the user via mail of the provided error.
+ * Attaches additional information as a log file, if it is to big for the mail body.
  */
 function notifyUserOfError(error) {
-  let body = "Your script, " + getScriptName() + ", has recently failed to finish successfully. The error stack is shown below.\n\n";
-  body += error.stack;
-  if (error.hasOwnProperty("cause")) {
-    body += "\n\ncaused by:\n\n" + JSON.stringify(error.cause);
-  }
-  body += "\n\n" + Logger.getLog();
+  let body = "Your script, " + getScriptName() + ", has recently failed to finish successfully.";
 
-  MailApp.sendEmail(
-    Session.getEffectiveUser().getEmail(),
-    getScriptName() + " failed!",
-    body
-  );
+  let message = {
+    to: Session.getEffectiveUser().getEmail(),
+    subject: getScriptName() + " failed!",
+    body: body,
+  }
+
+  let extendedBody = error.stack;
+  if (error.hasOwnProperty("cause")) {
+    extendedBody += "\n\ncaused by:\n\n" + JSON.stringify(error.cause);
+  }
+  let log = Logger.getLog();
+  extendedBody += (log == "" ? "" : "\n\n" + log);
+
+  if (extendedBody == "") {
+    // do nothing
+  }
+  // Check for the 100 KB body limit of Google Apps Script
+  else if (Utilities.newBlob(body + "\n\n" + extendedBody).getBytes().length > 100 * 1000) {
+    let timestamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd HHmmss");
+    let extendedFilename = getScriptName().replace(/[/\\?%*:|"<>]/g, "") + " " + timestamp + ".log";
+    let extendedBlob = Utilities.newBlob(extendedBody, 'text/plain', extendedFilename);
+
+    message["body"] += "\n\nAdditional information has been attached as '" + extendedFilename + "'.";
+    message["attachments"] = [extendedBlob];
+  }
+  else {
+    message["body"] += "\n\n" + extendedBody;
+  }
+
+  MailApp.sendEmail(message);
 }
 
 /**
