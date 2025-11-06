@@ -1,5 +1,5 @@
 /**
- * Notify Quest Latecomers v1.1.2 by Turac
+ * Notify Quest Latecomers v1.2.0 by Turac
  *
  * See Wiki page for info & setup instructions:
  * https://habitica.fandom.com/wiki/Notify_Quest_Latecomers
@@ -27,6 +27,7 @@ const PM_TO_LATECOMERS = false;
 /* ========================================== */
 // [Authors] Place all optional user-modified variables here
 // - e.g. enable/disable notifications, enable/disable script features, etc.
+const NAME_QUEST_OWNER = false;
 const MESSAGE_TO_DISCORD = true;
 const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1234567890/abcdefghijklmnopqrstuvwxyz";
 
@@ -152,19 +153,17 @@ function deleteTriggers() {
 function deleteWebhooks() {
   // [Authors] This function deletes all existing webhooks to your script
 
-  let response = api_fetch("https://habitica.com/api/v3/user/webhook", GET_PARAMS);
-  let obj = parseJSON(response);
-  let webhooks = obj.data;
+  let webhooks = api_getWebhooks();
 
   if (webhooks.length > 0) {
 
-    console.log("Deleting webhooks");
+    logInfo("Deleting webhooks");
 
     let webAppURL = getWebAppURL();
 
     for (let webhook of webhooks) {
       if (webhook.url == webAppURL) {
-        api_fetch("https://habitica.com/api/v3/user/webhook/" + webhook.id, DELETE_PARAMS);
+        api_deleteWebhook(webhook.id);
       }
     }
   }
@@ -223,7 +222,7 @@ function validateOptions() {
   }
 
   if (!valid) {
-    logInfo("Please fix the above errors, create a new version of the deployment, and run the doOneTimeSetup() function again.\nIf you aren't sure how to do this, see \"Changing the Settings\" in the documentation for this script.");
+    logInfo("Please fix the above errors, create a new version of the deployment, and click \"Install\" again.\nIf you aren't sure how to do this, see \"Updating options\" in the documentation for this script.");
   }
 
   return valid;
