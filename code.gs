@@ -11,12 +11,14 @@ function processWebhookInstant(type, data) {
 
   if (type == "questInvited") {
     scriptProperties.setProperty("lastQuestInvite", new Date().toISOString());
+    logInfo("Received questInvited webhook");
 
     return false;
   }
 
   if (type == "questStarted") {
     scriptProperties.setProperty("lastQuestStart", new Date().toISOString());
+    logInfo("Received questStarted webhook");
   }
 }
 
@@ -81,10 +83,8 @@ function processWebhookDelayed(type, data) {
     discordMessage += happyMessage + " :tada:";
   }
 
-  if (PM_TO_LATECOMERS) {
-    for (let member of latecomers) {
-      api_sendPM(latecomerMessage, member.id);
-    }
+  if (MESSAGE_TO_PARTY) {
+    api_sendPartyMessage(leaderMessage);
   }
 
   if (PM_TO_PARTY_LEADER_IF_LATECOMERS && latecomers.length > 0) {
@@ -95,12 +95,19 @@ function processWebhookDelayed(type, data) {
     api_sendPM(leaderMessage, partyLeader.id);
   }
 
-  if (MESSAGE_TO_PARTY) {
-    api_sendPartyMessage(leaderMessage);
+  if (PM_TO_LATECOMERS) {
+    for (let member of latecomers) {
+      api_sendPM(latecomerMessage, member.id);
+    }
   }
 
   if (MESSAGE_TO_DISCORD) {
-    sendDiscordMessage(discordMessage);
+    try {
+      sendDiscordMessage(discordMessage);
+    }
+    catch (e) {
+      throw new Error("Failed to send Discord message", { cause: e });
+    }
   }
 }
 
@@ -119,7 +126,7 @@ function sendDiscordMessage(message) {
     "method": "POST",
     "contentType": "application/json",
     "payload": JSON.stringify(payload),
-    "muteHttpExceptions": true
+    "muteHttpExceptions": false,
   }
 
   return UrlFetchApp.fetch(DISCORD_WEBHOOK_URL, params);
