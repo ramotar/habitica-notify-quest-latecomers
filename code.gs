@@ -11,12 +11,14 @@ function processWebhookInstant(type, data) {
 
   if (type == "questInvited") {
     scriptProperties.setProperty("lastQuestInvite", new Date().toISOString());
+    logInfo("Received questInvited webhook");
 
     return false;
   }
 
   if (type == "questStarted") {
     scriptProperties.setProperty("lastQuestStart", new Date().toISOString());
+    logInfo("Received questStarted webhook");
   }
 }
 
