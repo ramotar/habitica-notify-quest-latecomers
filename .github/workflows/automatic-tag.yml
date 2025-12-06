@@ -1,0 +1,31 @@
+name: Automatic Tag
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  create-tag:
+    if: startsWith(github.event.head_commit.message, 'Merge version ')
+    name: Create Tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Extract version from commit message
+        id: extract_version
+        run: |
+          version=$(echo "${{ github.event.head_commit.message }}" | grep -oP '(?<=Merge version )\d+\.\d+\.\d+')
+          echo "Version: $version"
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Create and push tag
+        run: |
+          git tag -m "Version ${{ steps.extract_version.outputs.version }}" "v${{ steps.extract_version.outputs.version }}"
+          git push origin "v${{ steps.extract_version.outputs.version }}"
