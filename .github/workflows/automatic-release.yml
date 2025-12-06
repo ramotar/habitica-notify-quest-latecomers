@@ -2,32 +2,45 @@ name: Automatic Release
 
 on:
   push:
-    tags:
-      - "v*.*.*"
+    branches:
+      - main
 
 permissions:
   contents: write
 
 jobs:
   automatic-release:
-    name: Create GitHub Release automatically
+    if: startsWith(github.event.head_commit.message, 'Merge version ')
+    name: Create Tag
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Extract version without leading v
+      - name: Extract version from commit message
         id: extract_version
         run: |
-          version=$(echo "${{ github.ref_name}}" | sed 's/^v//')
+          version=$(echo "${{ github.event.head_commit.message }}" | grep -oP '^Merge version \d+\.\d+\.\d+$' | grep -oP '\d+\.\d+\.\d+')
+          if [[ -z "$version" ]]; then
+            echo "Error: Commit message does not contain a valid version (e.g., Merge version 1.2.3)."
+            exit 1
+          fi
           echo "Version: $version"
           echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Create and push tag
+        run: |
+          git config user.name "${{ github.event.pusher.name }}"
+          git config user.email "${{ github.event.pusher.email }}"
+          git tag -m "Version ${{ steps.extract_version.outputs.version }}" "v${{ steps.extract_version.outputs.version }}"
+          git push origin "v${{ steps.extract_version.outputs.version }}"
 
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2.5.0
         with:
+          tag_name: v${{ steps.extract_version.outputs.version }}
           name: Version ${{ steps.extract_version.outputs.version }}
           body: |
             Automated release for version ${{ steps.extract_version.outputs.version }}
