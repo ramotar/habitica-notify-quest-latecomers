@@ -27,5 +27,7 @@ jobs:
 
       - name: Create and push tag
         run: |
+          git config user.name "${{ github.event.pusher.name }}"
+          git config user.email "${{ github.event.pusher.email }}"
           git tag -m "Version ${{ steps.extract_version.outputs.version }}" "v${{ steps.extract_version.outputs.version }}"
           git push origin "v${{ steps.extract_version.outputs.version }}"
