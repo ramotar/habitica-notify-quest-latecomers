@@ -102,7 +102,12 @@ function processWebhookDelayed(type, data) {
   }
 
   if (MESSAGE_TO_DISCORD) {
-    sendDiscordMessage(discordMessage);
+    try {
+      sendDiscordMessage(discordMessage);
+    }
+    catch (e) {
+      throw new Error("Failed to send Discord message", { cause: e });
+    }
   }
 }
 
@@ -121,7 +126,7 @@ function sendDiscordMessage(message) {
     "method": "POST",
     "contentType": "application/json",
     "payload": JSON.stringify(payload),
-    "muteHttpExceptions": true
+    "muteHttpExceptions": false,
   }
 
   return UrlFetchApp.fetch(DISCORD_WEBHOOK_URL, params);
