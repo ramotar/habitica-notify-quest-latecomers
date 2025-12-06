@@ -83,10 +83,8 @@ function processWebhookDelayed(type, data) {
     discordMessage += happyMessage + " :tada:";
   }
 
-  if (PM_TO_LATECOMERS) {
-    for (let member of latecomers) {
-      api_sendPM(latecomerMessage, member.id);
-    }
+  if (MESSAGE_TO_PARTY) {
+    api_sendPartyMessage(leaderMessage);
   }
 
   if (PM_TO_PARTY_LEADER_IF_LATECOMERS && latecomers.length > 0) {
@@ -97,8 +95,10 @@ function processWebhookDelayed(type, data) {
     api_sendPM(leaderMessage, partyLeader.id);
   }
 
-  if (MESSAGE_TO_PARTY) {
-    api_sendPartyMessage(leaderMessage);
+  if (PM_TO_LATECOMERS) {
+    for (let member of latecomers) {
+      api_sendPM(latecomerMessage, member.id);
+    }
   }
 
   if (MESSAGE_TO_DISCORD) {
